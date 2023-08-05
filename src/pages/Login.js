@@ -11,22 +11,73 @@ import {
   Pressable,
   Button,
   Box,
+  Alert,
+  useToast,
 } from 'native-base';
 import {PRIMARY, SECONDARY, WW} from '../statis/Statis';
 import AnimatedLottieView from 'lottie-react-native';
 import {Keyboard} from 'react-native';
+import {CommonActions} from '@react-navigation/native';
+import {POSTAPI} from '../utils/ConfigApi';
+import axios from 'axios';
+import {saveDataToMMKV} from '../utils/ConfigMMKV';
 
 const Login = route => {
   const Navigation = route.route.navigation;
   const insets = useSafeAreaInsets();
-  const [phone, setphone] = useState(0);
-  const handleLogin = () => {
-    Navigation.navigate('Otp', phone);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const toast = useToast();
+
+  const handleLogin = async () => {
+    let data = {
+      email: email,
+      password: password,
+    };
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://tht-api.nutech-integrasi.app/login',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
+
+    axios
+      .request(config)
+      .then(response => {
+        saveDataToMMKV(response.data.data.token);
+        console.log(response.data);
+      })
+      .catch(error => {
+        toast.show({
+          title: 'Email/Password Salah!',
+          background: 'danger.500',
+          duration: 1000,
+        });
+      });
+    // Navigation.dispatch(
+    //   CommonActions.reset({
+    //     index: 0,
+    //     routes: [{name: 'TabStack'}], // Replace 'Home' with the name of the screen you want to navigate to
+    //   }),
+    // );
   };
   const handleRegist = () => {
     Navigation.navigate('Register');
   };
+  const validateEmail = () => {
+    const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
+    if (!emailPattern.test(email)) {
+      toast.show({
+        title: 'Periksa lagi email kamu',
+        background: 'danger.500',
+      });
+    }
+  };
   return (
     <Pressable flex={1} onPress={() => Keyboard.dismiss()}>
       <Box
@@ -41,51 +92,64 @@ const Login = route => {
           size="full"
         />
 
-        <Box mt={insets.top} size={WW} p={4} space={1}>
+        <Box
+          alignSelf={'center'}
+          alignItems={'center'}
+          mt={insets.top}
+          size={WW * 0.7}
+          p={4}
+          space={1}>
           <AnimatedLottieView
             autoPlay
             source={require('../assets/lotties/login.json')}
             loop={false}
           />
-          {/* <Text fontWeight={'semibold'} color={PRIMARY} fontSize="xl">
-          Login
-        </Text>
-        <Text numberOfLines={2} color={'gray.400'} fontSize="sm">
-          We happy to see you again. To use your account, you must log in first.
-        </Text> */}
         </Box>
-        <VStack p={4} space={8}>
+        <VStack p={4} space={4}>
           <VStack space={2}>
-            <Text fontWeight={'semibold'} color={'white'} fontSize="xl">
-              Phone Number
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              Email
             </Text>
             <Input
-              onChangeText={TEXT => setphone(TEXT)}
-              rounded={'xl'}
-              p={5}
+              onChangeText={TEXT => setEmail(TEXT)}
+              onBlur={() => validateEmail()}
+              rounded={'md'}
+              p2={2}
               borderWidth={1}
               borderColor={'white'}
               fontSize={'md'}
               bg={'blue.50'}
-              placeholder="8229282323"
+              placeholder="Email"
               _focus={{
                 backgroundColor: 'blue.50',
                 borderColor: PRIMARY,
               }}
-              leftElement={
-                <Text ml={5} fontSize="md">
-                  62
-                </Text>
-              }
             />
-            <Pressable>
-              <Text color={SECONDARY.GREY4} textAlign={'right'} fontSize="xs">
-                Forgot Password?
-              </Text>
-            </Pressable>
           </VStack>
+          <VStack space={2}>
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              Password
+            </Text>
+            <Input
+              secureTextEntry
+              onChangeText={TEXT => setPassword(TEXT)}
+              rounded={'md'}
+              p2={2}
+              borderWidth={1}
+              borderColor={'white'}
+              fontSize={'md'}
+              bg={'blue.50'}
+              placeholder="Password"
+              _focus={{
+                backgroundColor: 'blue.50',
+                borderColor: PRIMARY,
+              }}
+            />
+          </VStack>
+
           <VStack space={5}>
             <Button
+              mt={5}
               py={4}
               rounded={'xl'}
               bg={PRIMARY.ORANGE}

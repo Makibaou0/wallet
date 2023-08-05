@@ -1,3 +1,5 @@
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -6,133 +8,138 @@ import {
   FlatList,
   HStack,
   Image,
-  StatusBar,
+  Pressable,
+  ScrollView,
   Text,
   VStack,
 } from 'native-base';
-import React from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {WH, dataTransaksi} from '../statis/Statis';
+import {PRIMARY, SECONDARY, WH, WW, inset} from '../statis/Statis';
+import EyeHideIcon from '../assets/icons/EyeHideIcon';
+import BellIcon from '../assets/icons/BellIcon';
+import EyeShowIcon from '../assets/icons/EyeShowIcon';
+import PlusIcon from '../assets/icons/PlusIcon';
+import UpwardIcon from '../assets/icons/UpwardIcon';
+import BellowIcon from '../assets/icons/BellowIcon';
+import InternetIcon from '../assets/icons/InternetIcon';
+import GoldIcon from '../assets/icons/GoldIcon';
+import ElectricityIcon from '../assets/icons/ElectricityIcon';
+import OthersIcon from '../assets/icons/OthersIcon';
+import ImageIcon from '../assets/icons/ImageIcon';
+import {formattedCurrency} from '../utils/FormatCurrency';
+import {GETAPI} from '../utils/ConfigApi';
+import {SAMPLEDATA} from '../statis/SampleData';
+import axios from 'axios';
+import {getDataFromMMKV} from '../utils/ConfigMMKV';
 
-const History = route => {
-  const Navigation = route.route.navigation;
-  const filter = [
-    {
-      title: 'All',
-      active: true,
-    },
-    {
-      title: 'Income',
-      active: false,
-    },
-    {
-      title: 'Expense',
-      active: false,
-    },
-  ];
+const History = () => {
+  const [transactions, setTransactions] = useState([]);
+  const insets = useSafeAreaInsets();
+  useEffect(() => {
+    getHistory();
+  }, []);
+  const getHistory = async () => {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'https://tht-api.nutech-integrasi.app/transactionHistory',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getDataFromMMKV('token')}`,
+      },
+    };
+
+    axios
+      .request(config)
+      .then(response => {
+        setTransactions(response.data.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   return (
-    <Box flex={1}>
-      <SafeAreaView
-        style={{
-          backgroundColor: 'black',
-        }}>
-        <StatusBar barStyle={'light-content'} />
-      </SafeAreaView>
-      <VStack flex={1}>
-        <HStack
-          justifyContent={'space-between'}
-          alignItems={'center'}
-          bg="black"
-          px={5}
-          pb={5}>
-          <VStack>
-            <Text fontSize="xs" color="white">
-              Balance
+    <Box flex={1} bg="white">
+      <Box bg={PRIMARY.BLUE} position={'absolute'}>
+        <Image
+          source={require('../assets/images/Wallpaper.png')}
+          alt="Alternate Text"
+          w={WW}
+          h={187}
+          resizeMode="stretch"
+        />
+      </Box>
+      <HStack
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        pt={insets.top + WH * 0.02}
+        px={5}
+        rounded="lg">
+        <VStack>
+          <HStack space={3}>
+            <Text fontWeight={'bold'} fontSize={'2xl'} color="white">
+              History
             </Text>
-            <Text fontWeight={'semibold'} fontSize="xl" color="white">
-              Rp 5.450.000
-            </Text>
-          </VStack>
-          <Image
-            rounded={'full'}
-            source={{
-              uri: 'https://wallpaperaccess.com/full/317501.jpg',
-            }}
-            alt="Alternate Text"
-            size="xs"
-          />
-        </HStack>
-        <Text fontWeight={'semibold'} p={5} fontSize="sm">
-          Transactions
-        </Text>
-        <HStack space={4} px={5}>
-          {filter.map((item, index) => {
-            return (
-              <Button
-                opacity={item.active === true ? 1 : 0.5}
-                key={index}
-                rounded={'md'}
-                bg="white"
-                p={2}
-                px={5}
-                colorScheme="black"
-                onPress={() => {
-                  console.log('hello');
-                }}>
-                <Text fontSize="xs" fontWeight={'semibold'}>
-                  {item.title}
-                </Text>
-              </Button>
-            );
-          })}
-        </HStack>
-
+          </HStack>
+        </VStack>
+      </HStack>
+      <Box flex={1} mt={5}>
         <FlatList
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            paddingBottom: WH * 0.05,
+            flexGrow: 1,
+            paddingBottom: inset().bottom * 3,
+            backgroundColor: 'white',
           }}
-          flexGrow={1}
-          p={5}
-          data={dataTransaksi}
-          renderItem={({item}) => (
-            <HStack space={4} mb={5} bg="white" p="3" rounded="lg">
-              <Box bg="blueGray.100" p="2" rounded="lg">
-                {item.kategori === 'Income' ? (
-                  <ArrowDownIcon color="success.500" />
-                ) : (
-                  <ArrowUpIcon color="danger.500" />
-                )}
-              </Box>
-              <HStack flex={1} justifyContent={'space-between'}>
-                <VStack>
-                  <Text fontWeight={'semibold'} fontSize="xs">
-                    {item.title}
-                  </Text>
-                  <Text color="gray.400" fontSize="2xs">
-                    {item.desc}
-                  </Text>
-                </VStack>
-                <VStack alignItems={'flex-end'}>
+          data={transactions}
+          renderItem={({item, index}) => (
+            <Pressable
+              mx={5}
+              borderBottomWidth={1}
+              borderBottomColor={SECONDARY.GREY4}
+              onPress={() => console.log('dss')}>
+              <HStack space={4} py={5} flex={1}>
+                <Box
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  h={37}
+                  w={37}
+                  bg={
+                    item.transaction_type == 'transfer'
+                      ? 'danger.500'
+                      : 'success.500'
+                  }
+                  rounded="md">
+                  {item.transaction_type == 'transfer' ? (
+                    <UpwardIcon color="white" size={24} />
+                  ) : (
+                    <PlusIcon size={22} color={'white'} />
+                  )}
+                </Box>
+                <VStack space={2} flex={1}>
                   <Text
-                    color={
-                      item.kategori === 'Income' ? 'success.500' : 'danger.500'
-                    }
-                    fontWeight={'semibold'}
+                    fontWeight={'medium'}
+                    numberOfLines={2}
+                    flex={1}
                     fontSize="xs">
-                    {item.kategori === 'Income' ? '+ ' : '- '}
-                    {'Rp ' + item.nominal}
+                    {item.transaction_type.toUpperCase()}
                   </Text>
-                  <Text color="gray.400" fontSize="2xs">
-                    {item.date}
+                  <Text
+                    fontWeight={'medium'}
+                    numberOfLines={2}
+                    flex={1}
+                    fontSize="xs">
+                    Rp {formattedCurrency(item.amount)}
+                  </Text>
+                  <Text color={SECONDARY.GREY2} fontSize="xs">
+                    {item.transaction_time}
                   </Text>
                 </VStack>
               </HStack>
-            </HStack>
+            </Pressable>
           )}
         />
-      </VStack>
+      </Box>
     </Box>
   );
 };

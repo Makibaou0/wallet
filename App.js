@@ -14,7 +14,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import Ob from './src/pages/Ob';
 import Login from './src/pages/Login';
-import Otp from './src/pages/Otp';
 import QrIcon from './src/assets/icons/QrIcon';
 import Qr from './src/pages/Qr';
 import HomeIcon from './src/assets/icons/HomeIcon';
@@ -27,58 +26,11 @@ import {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import BillIcon from './src/assets/icons/BillIcon';
 import MessageIcon from './src/assets/icons/MessageIcon';
-import InputId from './src/pages/InputId';
 import Register from './src/pages/Register';
 import Notifikasi from './src/pages/Notifikasi';
 import Splash from './src/pages/Splash';
-const theme = extendTheme({
-  fontConfig: {
-    Poppins: {
-      100: {
-        normal: 'Poppins-Light',
-        italic: 'Poppins-LightItalic',
-      },
-      200: {
-        normal: 'Poppins-Light',
-        italic: 'Poppins-LightItalic',
-      },
-      300: {
-        normal: 'Poppins-Light',
-        italic: 'Poppins-LightItalic',
-      },
-      400: {
-        normal: 'Poppins-Regular',
-        italic: 'Poppins-Italic',
-      },
-      500: {
-        normal: 'Poppins-Medium',
-      },
-      600: {
-        normal: 'Poppins-Medium',
-        italic: 'Poppins-MediumItalic',
-      },
-
-      700: {
-        normal: 'Poppins-Bold',
-      },
-      800: {
-        normal: 'Poppins-Bold',
-        italic: 'Poppins-BoldItalic',
-      },
-      900: {
-        normal: 'Poppins-Bold',
-        italic: 'Poppins-BoldItalic',
-      },
-    },
-  },
-
-  // Make sure values below matches any of the keys in `fontConfig`
-  fonts: {
-    heading: 'Poppins',
-    body: 'Poppins',
-    mono: 'Poppins',
-  },
-});
+import {theme} from './src/statis/theme';
+import Profile from './src/pages/Profile';
 
 const HomeScreen = route => {
   return <Home route={route} />;
@@ -92,15 +44,11 @@ const ObScreen = route => {
 const LoginScreen = route => {
   return <Login route={route} />;
 };
-const OtpScreen = route => {
-  return <Otp route={route} />;
-};
+
 const HistoryScreen = route => {
   return <History route={route} />;
 };
-const InputIdScreen = route => {
-  return <InputId route={route} />;
-};
+
 const RegisterScreen = route => {
   return <Register route={route} />;
 };
@@ -110,13 +58,16 @@ const NotifikasiScreen = route => {
 const SplashScreen = route => {
   return <Splash route={route} />;
 };
+const ProfileScreen = route => {
+  return <Profile route={route} />;
+};
 const TabStackScreen = route => {
   const tabs = [
     {name: 'Home', component: HomeScreen},
     {name: 'CashFlow', component: HistoryScreen},
     {name: 'Qr', component: QrIs},
     {name: 'Message', component: QrIs},
-    {name: 'Me', component: QrIs},
+    {name: 'Profile', component: ProfileScreen},
   ];
 
   return (
@@ -196,7 +147,7 @@ const TabStackScreen = route => {
               />
             );
           }
-          if (route.name === 'Me') {
+          if (route.name === 'Profile') {
             iconName = focused ? (
               <UserIcon
                 active={true}
@@ -234,7 +185,10 @@ const App = () => {
     <GestureHandlerRootView flex={1}>
       <SafeAreaProvider>
         <NativeBaseProvider theme={theme}>
-          <StatusBar barStyle={'light-content'} />
+          <StatusBar
+            backgroundColor={PRIMARY.BLUE}
+            barStyle={'light-content'}
+          />
 
           <NavigationContainer>
             <Stack.Navigator
@@ -243,13 +197,13 @@ const App = () => {
                 headerShown: false,
               }}>
               <Stack.Screen name="Splash" component={SplashScreen} />
-              <Stack.Screen name="TabStack" component={TabStackScreen} />
-              <Stack.Screen name="Ob" component={ObScreen} />
               <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="TabStack" component={TabStackScreen} />
+
               <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
-              <Stack.Screen name="Otp" component={OtpScreen} />
+              <Stack.Screen name="Profile" component={ProfileScreen} />
+
               <Stack.Screen name="Register" component={RegisterScreen} />
-              <Stack.Screen name="InputId" component={InputIdScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </NativeBaseProvider>

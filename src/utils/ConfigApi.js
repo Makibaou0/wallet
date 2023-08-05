@@ -1,47 +1,61 @@
 import axios from 'axios';
 import {getDataFromMMKV, saveDataToMMKV} from './ConfigMMKV';
 
-const baseUrlApi = 'https://api-thumbclick.rlangcodes.my.id';
-const versionApi = 'v1';
-export const LOGINAPI = `${baseUrlApi}/api/${versionApi}/login`;
+const baseUrlApi = 'https://tht-api.nutech-integrasi.app';
 
 export const POSTAPI = async key => {
-  const url = `${baseUrlApi}/api/${versionApi}/${key.key}`;
-
+  const url = `${baseUrlApi}/${key.key}`;
   const params = key.params;
-  const headers = {
-    'Content-Type': 'application/json', // Contoh header khusus (dapat disesuaikan)
-    'api-key': 'sICicKR0YJWcHWctBa9hklle6U76fikj', // Contoh header khusus (dapat disesuaikan)
-  };
 
-  try {
-    const response = await axios.post(url, params, {headers});
-    const data = response.data.data;
-    saveDataToMMKV('Token', data.token);
-    if (url === 'login') {
-      saveDataToMMKV('Token', data.token);
-    } else {
+  if (key.type == 'auth') {
+    const headers = {
+      'Content-Type': 'application/json', // Contoh header khusus (dapat disesuaikan)
+      'api-key': 'sICicKR0YJWcHWctBa9hklle6U76fikj', // Contoh header khusus (dapat disesuaikan)
+    };
+
+    try {
+      const response = await axios.post(url, params, {headers});
+      const data = response.data;
+      console.log(response);
+
       return data;
+    } catch (error) {
+      console.log(error);
+      return error;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
+  } else {
+    const headers = {
+      'Content-Type': 'application/json', // Contoh header khusus (dapat disesuaikan)
+      // 'api-key': 'sICicKR0YJWcHWctBa9hklle6U76fikj', // Contoh header khusus (dapat disesuaikan)
+    };
+
+    try {
+      const response = await axios.post(url, params, {headers});
+      const data = response.data;
+      console.log(response);
+
+      return data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 };
 export const GETAPI = async key => {
-  const url = `${baseUrlApi}/api/${versionApi}/${key.key}`;
-
+  const url = `${baseUrlApi}/${key.key}`;
+  console.log(url);
   const params = key.params;
   const headers = {
     'Content-Type': 'application/json', // Contoh header khusus (dapat disesuaikan)
-    Authorization: `Bearer ${getDataFromMMKV('Token')}`,
+    Authorization: `Bearer ${getDataFromMMKV('token')}`,
   };
   try {
     const response = await axios.get(url, {headers});
     const data = response.data;
+    console.log(data);
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.log('Error:', error);
     return null;
   }
 };

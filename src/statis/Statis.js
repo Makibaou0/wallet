@@ -1,4 +1,5 @@
 import {Dimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 export const PRIMARY = {
   BLUE: '#1F6CFF',
   ORANGE: '#FF9900',
@@ -35,113 +36,7 @@ export const COLOR5 = '#415352';
 
 export const WW = Dimensions.get('screen').width;
 export const WH = Dimensions.get('screen').height;
-
-export const COLOR = {
-  swatch_1: '#fbfbfb',
-  swatch_2: '#003786',
-  swatch_3: '#a6bcc7',
-  swatch_4: '#13273b',
-  swatch_5: '#5798c3',
-  swatch_6: '#4174a8',
-  swatch_7: '#dc712e',
+export const inset = () => {
+  const inset = useSafeAreaInsets();
+  return inset;
 };
-export const dataTransaksi = [
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Top Up',
-    desc: 'Pulsa',
-    nominal: '500.000',
-    kategori: 'Expense',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Top Up',
-    desc: 'Top Up Dana',
-    nominal: '500.000',
-    kategori: 'Expense',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Top Up',
-    desc: 'Pulsa',
-    nominal: '500.000',
-    kategori: 'Expense',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Payment',
-    desc: 'Payment From Paypal',
-    nominal: '500.000',
-    kategori: 'Income',
-    date: '19 Dec',
-  },
-  {
-    title: 'Top Up',
-    desc: 'Top Up Dana',
-    nominal: '500.000',
-    kategori: 'Expense',
-    date: '19 Dec',
-  },
-];

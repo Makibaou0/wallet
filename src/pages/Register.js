@@ -1,129 +1,214 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
-  ArrowBackIcon,
-  Box,
-  Button,
-  HStack,
+  Center,
+  Image,
   VStack,
   Text,
-  Alert,
-  Image,
+  Input,
+  SunIcon,
+  HStack,
   Pressable,
+  Button,
+  Box,
+  Alert,
+  useToast,
+  ChevronLeftIcon,
 } from 'native-base';
-import {PRIMARY, SECONDARY, WH, WW} from '../statis/Statis';
+import {PRIMARY, SECONDARY, WW, inset} from '../statis/Statis';
 import AnimatedLottieView from 'lottie-react-native';
-import {CodeField, Cursor} from 'react-native-confirmation-code-field';
-
-import CountDown from 'react-native-countdown-component';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Keyboard} from 'react-native';
-const Register = route => {
+import {CommonActions} from '@react-navigation/native';
+import {POSTAPI} from '../utils/ConfigApi';
+import {saveDataToMMKV} from '../utils/ConfigMMKV';
+
+const Registrasi = route => {
   const Navigation = route.route.navigation;
-  const Params = route.route.route.params;
-  const [resendEnabled, setResendEnabled] = useState(false);
   const insets = useSafeAreaInsets();
-  const handleResendOTP = () => {
-    // Logika untuk mengirim ulang OTP
-    Alert.alert('OTP dikirim ulang!');
-    setResendEnabled(false);
-  };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [validEmail, setvalidEmail] = useState(false);
+  const toast = useToast();
 
-  const handleCountdownFinish = () => {
-    setResendEnabled(true);
-  };
+  const handleSubmit = async () => {
+    const params = {
+      email: email,
+      password: password,
+      first_name: firstName,
+      last_name: lastName,
+    };
+    // console.log(params);
+    const post = await POSTAPI({
+      key: 'registration',
+      params: params,
+    });
 
-  const [otp, setOTP] = useState('');
+    toast.show({
+      title: post.message,
+      background: post.status != 0 ? 'danger.500' : 'success.500',
+      duration: 1000,
+    });
 
-  const handleOTPChange = code => {
-    console.log(code);
-    setOTP(code);
-  };
-  useEffect(() => {
-    if (otp.length === 4) {
-      Keyboard.dismiss();
+    if (post.status == 0) {
+      const paramsLogin = {
+        email: post.data.email,
+        password: password,
+      };
+      const login = await POSTAPI({
+        key: 'login',
+        params: paramsLogin,
+      });
+      saveDataToMMKV('token', login.data.token);
+      Navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'TabStack'}], // Replace 'Home' with the name of the screen you want to navigate to
+        }),
+      );
+    } else {
+      toast.show({
+        title: post.message,
+        background: 'danger.500',
+        duration: 1000,
+      });
     }
-  }, [otp]);
+  };
+
+  const validateEmail = () => {
+    const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+    if (!emailPattern.test(email)) {
+      toast.show({
+        title: 'Periksa lagi email kamu',
+        background: 'danger.500',
+      });
+      setvalidEmail(false);
+    } else {
+      setvalidEmail(true);
+    }
+  };
   return (
-    <Box
-      style={{
-        backgroundColor: PRIMARY.BLUE,
-        flex: 1,
-      }}>
-      <Pressable onPress={() => Keyboard.dismiss()}>
+    <Pressable flex={1} onPress={() => Keyboard.dismiss()}>
+      <Box
+        style={{
+          backgroundColor: PRIMARY.BLUE,
+          flex: 1,
+        }}>
         <Image
           position={'absolute'}
           source={require('../assets/images/BgCard.png')}
           alt="Alternate Text"
           size="full"
         />
+        <HStack alignItems={'center'} space={4} px={4} pt={inset().top}>
+          <Pressable onPress={() => Navigation.goBack()}>
+            <ChevronLeftIcon color="white" />
+          </Pressable>
+          <Text fontWeight={'semibold'} fontSize="md" color="white">
+            Registration
+          </Text>
+        </HStack>
 
-        <VStack px={2} pt={insets.top}>
-          <HStack>
-            <Button
-              colorScheme={'white'}
-              bg={PRIMARY.BLUE}
-              onPress={() => Navigation.goBack()}>
-              <ArrowBackIcon color={'white'} size={6} />
-            </Button>
-          </HStack>
-          <Box alignItems={'center'} justifyContent={'center'}>
-            <AnimatedLottieView
-              autoPlay
-              style={{
-                width: WW,
-                height: WW * 0.7,
+        <VStack p={4} space={4}>
+          <VStack space={2}>
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              Email
+            </Text>
+            <Input
+              onChangeText={TEXT => setEmail(TEXT)}
+              onBlur={() => validateEmail()}
+              rounded={'md'}
+              p2={2}
+              borderWidth={1}
+              borderColor={'white'}
+              fontSize={'md'}
+              bg={'blue.50'}
+              placeholder="Email"
+              _focus={{
+                backgroundColor: 'blue.50',
+                borderColor: PRIMARY,
               }}
-              loop={false}
-              source={require('../assets/lotties/otp.json')}
             />
-          </Box>
-          <VStack p={5}>
-            <Text color="white" fontWeight={'semibold'} fontSize="2xl">
-              Enter OTP
+          </VStack>
+          <VStack space={2}>
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              First Name
             </Text>
-            <Text color={SECONDARY.GREY4} fontSize="md">
-              An 4 digits code has been sent to +62 {Params}
+            <Input
+              onChangeText={TEXT => setFirstName(TEXT)}
+              rounded={'md'}
+              p2={2}
+              borderWidth={1}
+              borderColor={'white'}
+              fontSize={'md'}
+              bg={'blue.50'}
+              placeholder="First Name"
+              _focus={{
+                backgroundColor: 'blue.50',
+                borderColor: PRIMARY,
+              }}
+            />
+          </VStack>
+          <VStack space={2}>
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              Last Name
             </Text>
-            <CodeField
-              value={otp}
-              onChangeText={handleOTPChange}
-              cellCount={4}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              renderCell={({index, symbol, isFocused}) => (
-                <Box
-                  borderWidth={0.4}
-                  borderColor={SECONDARY.GREY4}
-                  my={5}
-                  rounded={'xl'}
-                  justifyContent={'center'}
-                  alignItems={'center'}
-                  size={16}
-                  key={index}>
-                  <Text color="white" fontSize={'xl'} fontWeight={'semibold'}>
-                    {symbol || (isFocused ? <Cursor /> : null)}
-                  </Text>
-                </Box>
-              )}
+            <Input
+              onChangeText={TEXT => setLastName(TEXT)}
+              rounded={'md'}
+              p={2}
+              borderWidth={1}
+              borderColor={'white'}
+              fontSize={'md'}
+              bg={'blue.50'}
+              placeholder="Last Name"
+              _focus={{
+                backgroundColor: 'blue.50',
+                borderColor: PRIMARY,
+              }}
+            />
+          </VStack>
+          <VStack space={2}>
+            <Text fontWeight={'semibold'} color={'white'} fontSize="sm">
+              Password
+            </Text>
+            <Input
+              secureTextEntry
+              onChangeText={TEXT => setPassword(TEXT)}
+              rounded={'md'}
+              p={2}
+              borderWidth={1}
+              borderColor={'white'}
+              fontSize={'md'}
+              bg={'blue.50'}
+              placeholder="Password"
+              _focus={{
+                backgroundColor: 'blue.50',
+                borderColor: PRIMARY,
+              }}
             />
           </VStack>
 
-          <Button
-            rounded={'xl'}
-            mx={5}
-            py={4}
-            bg={PRIMARY.ORANGE}
-            colorScheme="orange"
-            onPress={() => Navigation.navigate('TabStack')}>
-            <Text color="white" fontSize="md" fontWeight={'semibold'}>
-              Verifikasi
-            </Text>
-          </Button>
+          <VStack space={5}>
+            <Button
+              disabled={!validEmail}
+              mt={4}
+              py={4}
+              rounded={'xl'}
+              bg={validEmail == true ? PRIMARY.ORANGE : SECONDARY.GREY2}
+              colorScheme="blue"
+              onPress={() => handleSubmit()}>
+              <Text fontWeight={'semibold'} color="white" fontSize="md">
+                Login
+              </Text>
+            </Button>
+          </VStack>
         </VStack>
-      </Pressable>
-    </Box>
+      </Box>
+    </Pressable>
   );
 };
 
-export default Register;
+export default Registrasi;

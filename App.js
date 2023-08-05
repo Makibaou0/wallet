@@ -31,6 +31,7 @@ import Notifikasi from './src/pages/Notifikasi';
 import Splash from './src/pages/Splash';
 import {theme} from './src/statis/theme';
 import Profile from './src/pages/Profile';
+import Result from './src/pages/Result';
 
 const HomeScreen = route => {
   return <Home route={route} />;
@@ -60,6 +61,9 @@ const SplashScreen = route => {
 };
 const ProfileScreen = route => {
   return <Profile route={route} />;
+};
+const ResultScreen = route => {
+  return <Result route={route} />;
 };
 const TabStackScreen = route => {
   const tabs = [
@@ -199,10 +203,9 @@ const App = () => {
               <Stack.Screen name="Splash" component={SplashScreen} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="TabStack" component={TabStackScreen} />
-
+              <Stack.Screen name="Result" component={ResultScreen} />
               <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
-
               <Stack.Screen name="Register" component={RegisterScreen} />
             </Stack.Navigator>
           </NavigationContainer>

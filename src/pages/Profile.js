@@ -12,14 +12,15 @@ import {
 } from 'native-base';
 import {PRIMARY, WH, WW} from '../statis/Statis';
 
-import {GETAPI} from '../utils/ConfigApi';
+import {GETAPI, POSTAPI} from '../utils/ConfigApi';
 import axios from 'axios';
 import {getDataFromMMKV} from '../utils/ConfigMMKV';
+import {CommonActions} from '@react-navigation/native';
 
-const Profile = () => {
+const Profile = route => {
+  const Navigation = route.route.navigation;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
 
   const insets = useSafeAreaInsets();
   const toast = useToast();
@@ -33,7 +34,6 @@ const Profile = () => {
 
     setFirstName(profile.data.first_name);
     setLastName(profile.data.last_name);
-    setEmail(profile.data.email);
   };
   const handleSubmit = async () => {
     let data = JSON.stringify({
@@ -41,29 +41,24 @@ const Profile = () => {
       last_name: lastName,
     });
 
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'https://tht-api.nutech-integrasi.app/updateProfile',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getDataFromMMKV('token')}`,
-      },
-      data: data,
-    };
-
-    axios
-      .request(config)
-      .then(response => {
-        toast.show({
-          title: response.data.message,
-          background: 'success.500',
-          duration: 1000,
-        });
-      })
-      .catch(error => {
-        console.log(error);
+    const submit = await POSTAPI({
+      key: 'updateProfile',
+      params: data,
+    });
+    if (submit.status == 0) {
+      toast.show({
+        title: submit.message,
+        background: 'success.500',
+        duration: 1999,
       });
+
+      Navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'Result'}],
+        }),
+      );
+    }
   };
   return (
     <Box flex={1} bg="white">

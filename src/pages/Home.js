@@ -27,9 +27,10 @@ import ElectricityIcon from '../assets/icons/ElectricityIcon';
 import OthersIcon from '../assets/icons/OthersIcon';
 import ImageIcon from '../assets/icons/ImageIcon';
 import {formattedCurrency} from '../utils/FormatCurrency';
-import {GETAPI} from '../utils/ConfigApi';
+import {GETAPI, POSTAPI} from '../utils/ConfigApi';
 import axios from 'axios';
 import {getDataFromMMKV} from '../utils/ConfigMMKV';
+import {CommonActions} from '@react-navigation/native';
 
 const Home = route => {
   const Navigation = route.route.navigation;
@@ -84,37 +85,30 @@ const Home = route => {
     },
   ];
   const toast = useToast();
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let data = JSON.stringify({
-      amount: amount,
+      amount: amount.replace(/,/g, ''),
     });
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `https://tht-api.nutech-integrasi.app/${sheet}`,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getDataFromMMKV('token')}`,
-      },
-      data: data,
-    };
 
-    axios
-      .request(config)
-      .then(response => {
-        console.log(response.data);
-
-        toast.show({
-          title: response.data.message,
-          background: 'success.500',
-          duration: 1999,
-        });
-        setamount(0);
-        onClose();
-      })
-      .catch(error => {
-        console.log(error);
+    const submit = await POSTAPI({
+      key: sheet,
+      params: data,
+    });
+    if (submit.status == 0) {
+      toast.show({
+        title: submit.message,
+        background: 'success.500',
+        duration: 1999,
       });
+      setamount(0);
+      onClose();
+      Navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'Result'}],
+        }),
+      );
+    }
   };
   return (
     <Box flex={1} bg="white">
@@ -283,15 +277,21 @@ const Home = route => {
             <Input
               value={amount.toString()}
               keyboardType="number-pad"
-              onChangeText={Text => setamount(Text)}
+              onChangeText={Text => setamount(formattedCurrency(Text))}
               fontSize={'20'}
             />
             <Text color="danger.500" fontSize="xs">
               Minimum {sheet} Rp. 10.000
             </Text>
             <Button
-              disabled={amount < 10000 ? true : false}
-              bg={amount >= 10000 ? PRIMARY.ORANGE : SECONDARY.GREY2}
+              disabled={
+                amount.toString().replace(/,/g, '') < 10000 ? true : false
+              }
+              bg={
+                amount.toString().replace(/,/g, '') >= 10000
+                  ? PRIMARY.ORANGE
+                  : SECONDARY.GREY2
+              }
               colorScheme="orange"
               onPress={() => handleSubmit()}>
               <Text fontWeight={'semibold'} color="white" fontSize="md">

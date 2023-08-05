@@ -64,7 +64,7 @@ const Registrasi = route => {
       Navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{name: 'TabStack'}], // Replace 'Home' with the name of the screen you want to navigate to
+          routes: [{name: 'TabStack'}],
         }),
       );
     } else {

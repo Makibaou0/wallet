@@ -31,7 +31,8 @@ import {SAMPLEDATA} from '../statis/SampleData';
 import axios from 'axios';
 import {getDataFromMMKV} from '../utils/ConfigMMKV';
 
-const History = () => {
+const History = route => {
+  console.log(route);
   const [transactions, setTransactions] = useState([]);
   const insets = useSafeAreaInsets();
   useEffect(() => {

@@ -35,35 +35,30 @@ const Login = route => {
       password: password,
     };
 
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'https://tht-api.nutech-integrasi.app/login',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-    };
-
-    axios
-      .request(config)
-      .then(response => {
-        saveDataToMMKV(response.data.data.token);
-        console.log(response.data);
-      })
-      .catch(error => {
-        toast.show({
-          title: 'Email/Password Salah!',
-          background: 'danger.500',
-          duration: 1000,
-        });
+    const submit = await POSTAPI({
+      key: 'login',
+      params: data,
+    });
+    if (submit.status == 0) {
+      toast.show({
+        title: submit.message,
+        background: 'success.500',
+        duration: 1999,
       });
-    // Navigation.dispatch(
-    //   CommonActions.reset({
-    //     index: 0,
-    //     routes: [{name: 'TabStack'}], // Replace 'Home' with the name of the screen you want to navigate to
-    //   }),
-    // );
+
+      Navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'Result'}],
+        }),
+      );
+    } else {
+      toast.show({
+        title: submit.message,
+        background: 'danger.500',
+        duration: 1999,
+      });
+    }
   };
   const handleRegist = () => {
     Navigation.navigate('Register');

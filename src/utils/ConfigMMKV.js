@@ -1,6 +1,5 @@
 import {MMKV} from 'react-native-mmkv';
 
-// Inisialisasi MMKV instance
 const mmkv = new MMKV();
 
 export const saveDataToMMKV = (key, data) => {

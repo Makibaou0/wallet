@@ -291,7 +291,7 @@ const Home = route => {
             </Text>
             <Button
               disabled={amount < 10000 ? true : false}
-              bg={amount > 10000 ? PRIMARY.ORANGE : SECONDARY.GREY2}
+              bg={amount >= 10000 ? PRIMARY.ORANGE : SECONDARY.GREY2}
               colorScheme="orange"
               onPress={() => handleSubmit()}>
               <Text fontWeight={'semibold'} color="white" fontSize="md">

@@ -6,6 +6,7 @@ import {
   HStack,
   Image,
   Input,
+  Pressable,
   Text,
   VStack,
   useToast,
@@ -14,7 +15,7 @@ import {PRIMARY, WH, WW} from '../statis/Statis';
 
 import {GETAPI, POSTAPI} from '../utils/ConfigApi';
 import axios from 'axios';
-import {getDataFromMMKV} from '../utils/ConfigMMKV';
+import {getDataFromMMKV, saveDataToMMKV} from '../utils/ConfigMMKV';
 import {CommonActions} from '@react-navigation/native';
 
 const Profile = route => {
@@ -60,6 +61,15 @@ const Profile = route => {
       );
     }
   };
+  const handleLogout = () => {
+    saveDataToMMKV('token', null);
+    Navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      }),
+    );
+  };
   return (
     <Box flex={1} bg="white">
       <Box bg={PRIMARY.BLUE}>
@@ -78,13 +88,20 @@ const Profile = route => {
         pt={insets.top + WH * 0.02}
         px={5}
         rounded="lg">
-        <VStack>
-          <HStack space={3}>
-            <Text fontWeight={'bold'} fontSize={'2xl'} color="white">
-              Profile
+        <HStack flex={1} space={3} justifyContent={'space-between'}>
+          <Text fontWeight={'bold'} fontSize={'2xl'} color="white">
+            Profile
+          </Text>
+          <Pressable
+            rounded="md"
+            p="2"
+            bg="danger.500"
+            onPress={() => handleLogout()}>
+            <Text fontWeight={'bold'} fontSize={'xl'} color="white">
+              Logout
             </Text>
-          </HStack>
-        </VStack>
+          </Pressable>
+        </HStack>
       </HStack>
       <VStack space={2} p={5}>
         <Text fontSize="xs">Fist Name</Text>

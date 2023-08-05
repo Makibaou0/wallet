@@ -31,7 +31,7 @@ const Login = route => {
 
   const handleLogin = async () => {
     let data = {
-      email: email,
+      email: email.toLowerCase(),
       password: password,
     };
 
@@ -45,7 +45,7 @@ const Login = route => {
         background: 'success.500',
         duration: 1999,
       });
-
+      saveDataToMMKV('token', submit.data.token);
       Navigation.dispatch(
         CommonActions.reset({
           index: 0,
